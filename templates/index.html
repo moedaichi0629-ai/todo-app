@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Todoリスト</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+  <header class="header">
+    <h1 class="header__title">Todoリスト</h1>
+  </header>
+
+  <main class="container">
+
+    <!-- フラッシュメッセージ（操作後の通知） -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="alert alert--{{ category }}">{{ message }}</div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    <!-- ========== 新規登録フォーム ========== -->
+    <section class="card">
+      <h2 class="card__title">新しいTodoを追加</h2>
+      <form action="/add" method="POST" class="form">
+
+        <div class="form__group">
+          <label class="form__label" for="title">タイトル <span class="required">*必須</span></label>
+          <input
+            class="form__input"
+            type="text"
+            id="title"
+            name="title"
+            placeholder="例：レポートを提出する"
+            required
+          >
+        </div>
+
+        <div class="form__group">
+          <label class="form__label" for="content">内容</label>
+          <textarea
+            class="form__textarea"
+            id="content"
+            name="content"
+            placeholder="詳細を入力してください"
+            rows="3"
+          ></textarea>
+        </div>
+
+        <div class="form__group">
+          <label class="form__label" for="due_date">期日</label>
+          <input
+            class="form__input"
+            type="date"
+            id="due_date"
+            name="due_date"
+          >
+        </div>
+
+        <button class="btn btn--primary" type="submit">追加する</button>
+      </form>
+    </section>
+
+    <!-- ========== Todo一覧 ========== -->
+    <section class="card">
+      <h2 class="card__title">Todo一覧 <span class="badge">{{ todos|length }}件</span></h2>
+
+      {% if todos %}
+        <ul class="todo-list">
+          {% for todo in todos %}
+            <li class="todo-item">
+              <div class="todo-item__body">
+                <p class="todo-item__title">{{ todo.title }}</p>
+                {% if todo.content %}
+                  <p class="todo-item__content">{{ todo.content }}</p>
+                {% endif %}
+                {% if todo.due_date %}
+                  <p class="todo-item__due">
+                    <span class="icon">📅</span> 期日：{{ todo.due_date }}
+                  </p>
+                {% endif %}
+                <p class="todo-item__created">登録日時：{{ todo.created_at }}</p>
+              </div>
+              <div class="todo-item__actions">
+                <!-- 編集ボタン -->
+                <a href="/edit/{{ todo.id }}" class="btn btn--secondary">編集</a>
+                <!-- 削除ボタン（確認ダイアログ付き） -->
+                <form action="/delete/{{ todo.id }}" method="POST"
+                      onsubmit="return confirm('このTodoを削除しますか？')">
+                  <button class="btn btn--danger" type="submit">削除</button>
+                </form>
+              </div>
+            </li>
+          {% endfor %}
+        </ul>
+      {% else %}
+        <p class="empty-message">まだTodoが登録されていません。上のフォームから追加してください。</p>
+      {% endif %}
+    </section>
+
+  </main>
+
+</body>
+</html>

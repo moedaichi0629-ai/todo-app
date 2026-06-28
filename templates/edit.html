@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Todoを編集 | Todoリスト</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+  <header class="header">
+    <h1 class="header__title">Todoを編集</h1>
+  </header>
+
+  <main class="container">
+
+    <!-- フラッシュメッセージ -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="alert alert--{{ category }}">{{ message }}</div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    <section class="card">
+      <h2 class="card__title">情報を更新する</h2>
+
+      <!-- 編集フォーム（todo.id のURLにPOSTで送信） -->
+      <form action="/edit/{{ todo.id }}" method="POST" class="form">
+
+        <div class="form__group">
+          <label class="form__label" for="title">タイトル <span class="required">*必須</span></label>
+          <input
+            class="form__input"
+            type="text"
+            id="title"
+            name="title"
+            value="{{ todo.title }}"
+            required
+          >
+        </div>
+
+        <div class="form__group">
+          <label class="form__label" for="content">内容</label>
+          <textarea
+            class="form__textarea"
+            id="content"
+            name="content"
+            rows="4"
+          >{{ todo.content }}</textarea>
+        </div>
+
+        <div class="form__group">
+          <label class="form__label" for="due_date">期日</label>
+          <input
+            class="form__input"
+            type="date"
+            id="due_date"
+            name="due_date"
+            value="{{ todo.due_date }}"
+          >
+        </div>
+
+        <div class="form__actions">
+          <button class="btn btn--primary" type="submit">更新する</button>
+          <!-- キャンセルで一覧に戻る -->
+          <a href="/" class="btn btn--secondary">キャンセル</a>
+        </div>
+      </form>
+    </section>
+
+    <p class="todo-item__created" style="text-align:center; margin-top: 1rem;">
+      登録日時：{{ todo.created_at }}
+    </p>
+
+  </main>
+
+</body>
+</html>
