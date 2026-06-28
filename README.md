@@ -18,11 +18,14 @@
 
 <br>
 
-### Todo 一覧画面
+### Todo 一覧画面（優先順位・完了チェック付き）
 ![一覧画面](docs/screenshot_main.png)
 
-### 検索・フィルター画面
+### 検索・フィルター・登録フォーム
 ![検索画面](docs/screenshot_filter.png)
+
+### Google スプレッドシート（データ保存先）
+![スプレッドシート](docs/screenshot_spreadsheet.png)
 
 ### LINE 通知
 ![LINE通知](docs/screenshot_line.png)
