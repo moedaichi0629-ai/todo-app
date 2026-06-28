@@ -22,8 +22,8 @@ SCOPES = [
 
 SPREADSHEET_ID = os.getenv('SPREADSHEET_ID')
 
-# スプレッドシートの列定義（status 列を追加）
-HEADERS = ['id', 'title', 'content', 'due_date', 'created_at', 'status']
+# スプレッドシートの列定義
+HEADERS = ['id', 'title', 'content', 'due_date', 'created_at', 'status', 'priority']
 
 
 # ========== Google Sheets 接続 ==========
@@ -205,9 +205,10 @@ def index():
         todos = []
 
     # クエリパラメータから検索・フィルター条件を取得
-    query         = request.args.get('q', '').strip()
-    status_filter = request.args.get('status', 'all')   # all / incomplete / completed
-    due_filter    = request.args.get('due', 'all')       # all / overdue / today / tomorrow
+    query            = request.args.get('q', '').strip()
+    status_filter    = request.args.get('status', 'all')    # all / incomplete / completed
+    due_filter       = request.args.get('due', 'all')        # all / overdue / today / tomorrow
+    priority_filter  = request.args.get('priority', 'all')   # all / high / medium / low
 
     filtered = todos
 
@@ -227,6 +228,14 @@ def index():
     if due_filter != 'all':
         filtered = [t for t in filtered if t.get('due_status') == due_filter]
 
+    # 優先順位でフィルター
+    if priority_filter != 'all':
+        filtered = [t for t in filtered if t.get('priority') == priority_filter]
+
+    # 優先順位で並び替え（高→中→低→未設定）
+    priority_order = {'high': 0, 'medium': 1, 'low': 2, '': 3}
+    filtered.sort(key=lambda t: priority_order.get(t.get('priority', ''), 3))
+
     return render_template(
         'index.html',
         todos=filtered,
@@ -234,6 +243,7 @@ def index():
         query=query,
         status_filter=status_filter,
         due_filter=due_filter,
+        priority_filter=priority_filter,
     )
 
 
@@ -243,6 +253,7 @@ def add_todo():
     title    = request.form.get('title', '').strip()
     content  = request.form.get('content', '').strip()
     due_date = request.form.get('due_date', '').strip()
+    priority = request.form.get('priority', '').strip()   # high / medium / low / ''
 
     if not title:
         flash('タイトルを入力してください', 'error')
@@ -253,8 +264,8 @@ def add_todo():
 
     try:
         sheet = get_initialized_sheet()
-        # status 列も含めて追加（初期値は incomplete）
-        sheet.append_row([todo_id, title, content, due_date, created_at, 'incomplete'])
+        # priority 列も含めて追加
+        sheet.append_row([todo_id, title, content, due_date, created_at, 'incomplete', priority])
         flash('Todo を登録しました', 'success')
     except Exception as e:
         flash(f'登録に失敗しました: {e}', 'error')
@@ -269,6 +280,7 @@ def edit_todo(todo_id):
         title    = request.form.get('title', '').strip()
         content  = request.form.get('content', '').strip()
         due_date = request.form.get('due_date', '').strip()
+        priority = request.form.get('priority', '').strip()
 
         if not title:
             flash('タイトルを入力してください', 'error')
@@ -276,7 +288,7 @@ def edit_todo(todo_id):
 
         try:
             sheet   = get_initialized_sheet()
-            headers = sheet.row_values(1)   # ヘッダー行を取得して列番号を動的に解決
+            headers = sheet.row_values(1)
             id_col  = sheet.col_values(1)
 
             for i, cell_id in enumerate(id_col):
@@ -285,6 +297,8 @@ def edit_todo(todo_id):
                     sheet.update_cell(row_num, headers.index('title') + 1,    title)
                     sheet.update_cell(row_num, headers.index('content') + 1,  content)
                     sheet.update_cell(row_num, headers.index('due_date') + 1, due_date)
+                    if 'priority' in headers:
+                        sheet.update_cell(row_num, headers.index('priority') + 1, priority)
                     break
 
             flash('Todo を更新しました', 'success')

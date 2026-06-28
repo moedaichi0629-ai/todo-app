@@ -244,6 +244,19 @@ body {
 
 .todo-item__actions { display: flex; flex-direction: column; gap: 0.5rem; flex-shrink: 0; }
 
+/* ========== 優先順位バッジ ========== */
+.priority-badge {
+  display: inline-block;
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 0.15rem 0.5rem;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+.priority-badge--high   { background-color: #fee2e2; color: #991b1b; }
+.priority-badge--medium { background-color: #fef9c3; color: #854d0e; }
+.priority-badge--low    { background-color: #dbeafe; color: #1e40af; }
+
 /* ========== ② 期日バッジ ========== */
 .due-badge {
   display: inline-block;

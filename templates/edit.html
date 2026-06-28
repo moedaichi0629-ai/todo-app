@@ -72,6 +72,16 @@
           >
         </div>
 
+        <div class="form__group">
+          <label class="form__label" for="priority">優先順位</label>
+          <select class="form__input" id="priority" name="priority">
+            <option value=""       {% if not todo.priority %}selected{% endif %}>未設定</option>
+            <option value="high"   {% if todo.priority == 'high' %}selected{% endif %}>🔴 高</option>
+            <option value="medium" {% if todo.priority == 'medium' %}selected{% endif %}>🟡 中</option>
+            <option value="low"    {% if todo.priority == 'low' %}selected{% endif %}>🔵 低</option>
+          </select>
+        </div>
+
         <div class="form__actions">
           <button class="btn btn--primary" type="submit">更新する</button>
           <a href="/" class="btn btn--secondary">キャンセル</a>

@@ -54,9 +54,17 @@
             <option value="tomorrow" {% if due_filter == 'tomorrow' %}selected{% endif %}>🟡 明日が期限</option>
           </select>
 
+          <!-- 優先順位フィルター -->
+          <select class="search-bar__select" name="priority">
+            <option value="all"    {% if priority_filter == 'all' %}selected{% endif %}>優先度：すべて</option>
+            <option value="high"   {% if priority_filter == 'high' %}selected{% endif %}>🔴 高</option>
+            <option value="medium" {% if priority_filter == 'medium' %}selected{% endif %}>🟡 中</option>
+            <option value="low"    {% if priority_filter == 'low' %}selected{% endif %}>🔵 低</option>
+          </select>
+
           <button class="btn btn--primary" type="submit">検索</button>
 
-          {% if query or status_filter != 'all' or due_filter != 'all' %}
+          {% if query or status_filter != 'all' or due_filter != 'all' or priority_filter != 'all' %}
             <a href="/" class="btn btn--secondary">リセット</a>
           {% endif %}
 
@@ -100,6 +108,16 @@
             id="due_date"
             name="due_date"
           >
+        </div>
+
+        <div class="form__group">
+          <label class="form__label" for="priority">優先順位</label>
+          <select class="form__input" id="priority" name="priority">
+            <option value="">未設定</option>
+            <option value="high">🔴 高</option>
+            <option value="medium">🟡 中</option>
+            <option value="low">🔵 低</option>
+          </select>
         </div>
 
         <button class="btn btn--primary" type="submit">追加する</button>
@@ -146,9 +164,18 @@
 
               <div class="todo-item__body">
 
-                <!-- タイトル + 期日バッジ -->
+                <!-- タイトル + バッジ群 -->
                 <div class="todo-item__title-row">
                   <p class="todo-item__title">{{ todo.title }}</p>
+                  <!-- 優先順位バッジ -->
+                  {% if todo.priority == 'high' %}
+                    <span class="priority-badge priority-badge--high">🔴 高</span>
+                  {% elif todo.priority == 'medium' %}
+                    <span class="priority-badge priority-badge--medium">🟡 中</span>
+                  {% elif todo.priority == 'low' %}
+                    <span class="priority-badge priority-badge--low">🔵 低</span>
+                  {% endif %}
+                  <!-- 期日バッジ -->
                   {% if todo.due_status == 'overdue' %}
                     <span class="due-badge due-badge--overdue">⚠️ 期限切れ</span>
                   {% elif todo.due_status == 'today' %}
