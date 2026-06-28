@@ -9,12 +9,12 @@
 <body>
 
   <header class="header">
-    <h1 class="header__title">Todoリスト</h1>
+    <h1 class="header__title">📝 Todoリスト</h1>
   </header>
 
   <main class="container">
 
-    <!-- フラッシュメッセージ（操作後の通知） -->
+    <!-- フラッシュメッセージ -->
     {% with messages = get_flashed_messages(with_categories=true) %}
       {% if messages %}
         {% for category, message in messages %}
@@ -22,6 +22,47 @@
         {% endfor %}
       {% endif %}
     {% endwith %}
+
+    <!-- ========== ② 検索・フィルターバー ========== -->
+    <section class="card">
+      <form action="/" method="GET" class="search-bar">
+
+        <div class="search-bar__input-wrap">
+          <input
+            class="search-bar__input"
+            type="text"
+            name="q"
+            placeholder="キーワードで検索（タイトル・内容）"
+            value="{{ query }}"
+          >
+        </div>
+
+        <div class="search-bar__filters">
+
+          <!-- 完了ステータスフィルター -->
+          <select class="search-bar__select" name="status">
+            <option value="all"        {% if status_filter == 'all' %}selected{% endif %}>すべて</option>
+            <option value="incomplete" {% if status_filter == 'incomplete' %}selected{% endif %}>未完了のみ</option>
+            <option value="completed"  {% if status_filter == 'completed' %}selected{% endif %}>完了済みのみ</option>
+          </select>
+
+          <!-- 期日フィルター -->
+          <select class="search-bar__select" name="due">
+            <option value="all"      {% if due_filter == 'all' %}selected{% endif %}>期日：すべて</option>
+            <option value="overdue"  {% if due_filter == 'overdue' %}selected{% endif %}>⚠️ 期限切れ</option>
+            <option value="today"    {% if due_filter == 'today' %}selected{% endif %}>🔴 今日が期限</option>
+            <option value="tomorrow" {% if due_filter == 'tomorrow' %}selected{% endif %}>🟡 明日が期限</option>
+          </select>
+
+          <button class="btn btn--primary" type="submit">検索</button>
+
+          {% if query or status_filter != 'all' or due_filter != 'all' %}
+            <a href="/" class="btn btn--secondary">リセット</a>
+          {% endif %}
+
+        </div>
+      </form>
+    </section>
 
     <!-- ========== 新規登録フォーム ========== -->
     <section class="card">
@@ -67,39 +108,89 @@
 
     <!-- ========== Todo一覧 ========== -->
     <section class="card">
-      <h2 class="card__title">Todo一覧 <span class="badge">{{ todos|length }}件</span></h2>
+
+      <div class="card__title-row">
+        <h2 class="card__title">
+          Todo一覧
+          <span class="badge">{{ todos|length }}件
+            {% if todos|length != total_count %}/ 全{{ total_count }}件{% endif %}
+          </span>
+        </h2>
+
+        <!-- ③ LINE通知ボタン -->
+        <form action="/notify/line" method="POST">
+          <button class="btn btn--line" type="submit"
+                  title="期日が今日・明日・期限切れの未完了TodoをLINEに通知します">
+            📣 LINE通知
+          </button>
+        </form>
+      </div>
 
       {% if todos %}
         <ul class="todo-list">
           {% for todo in todos %}
-            <li class="todo-item">
+
+            <!-- 完了済みなら todo-item--completed クラスを付与 -->
+            <li class="todo-item {% if todo.status == 'completed' %}todo-item--completed{% endif %}">
+
+              <!-- ① 完了チェックボックス -->
+              <form action="/toggle/{{ todo.id }}" method="POST" class="todo-item__check-form">
+                <input
+                  class="todo-item__checkbox"
+                  type="checkbox"
+                  title="完了/未完了を切り替え"
+                  {% if todo.status == 'completed' %}checked{% endif %}
+                  onchange="this.form.submit()"
+                >
+              </form>
+
               <div class="todo-item__body">
-                <p class="todo-item__title">{{ todo.title }}</p>
+
+                <!-- タイトル + 期日バッジ -->
+                <div class="todo-item__title-row">
+                  <p class="todo-item__title">{{ todo.title }}</p>
+                  {% if todo.due_status == 'overdue' %}
+                    <span class="due-badge due-badge--overdue">⚠️ 期限切れ</span>
+                  {% elif todo.due_status == 'today' %}
+                    <span class="due-badge due-badge--today">🔴 今日</span>
+                  {% elif todo.due_status == 'tomorrow' %}
+                    <span class="due-badge due-badge--tomorrow">🟡 明日</span>
+                  {% endif %}
+                </div>
+
                 {% if todo.content %}
                   <p class="todo-item__content">{{ todo.content }}</p>
                 {% endif %}
+
                 {% if todo.due_date %}
-                  <p class="todo-item__due">
-                    <span class="icon">📅</span> 期日：{{ todo.due_date }}
-                  </p>
+                  <p class="todo-item__due">📅 期日：{{ todo.due_date }}</p>
                 {% endif %}
-                <p class="todo-item__created">登録日時：{{ todo.created_at }}</p>
+
+                <p class="todo-item__created">登録：{{ todo.created_at }}</p>
               </div>
+
               <div class="todo-item__actions">
-                <!-- 編集ボタン -->
                 <a href="/edit/{{ todo.id }}" class="btn btn--secondary">編集</a>
-                <!-- 削除ボタン（確認ダイアログ付き） -->
                 <form action="/delete/{{ todo.id }}" method="POST"
                       onsubmit="return confirm('このTodoを削除しますか？')">
                   <button class="btn btn--danger" type="submit">削除</button>
                 </form>
               </div>
+
             </li>
           {% endfor %}
         </ul>
+
       {% else %}
-        <p class="empty-message">まだTodoが登録されていません。上のフォームから追加してください。</p>
+        <p class="empty-message">
+          {% if query or status_filter != 'all' or due_filter != 'all' %}
+            条件に一致するTodoがありません。
+          {% else %}
+            まだTodoが登録されていません。上のフォームから追加してください。
+          {% endif %}
+        </p>
       {% endif %}
+
     </section>
 
   </main>

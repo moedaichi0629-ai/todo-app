@@ -9,7 +9,7 @@
 <body>
 
   <header class="header">
-    <h1 class="header__title">Todoを編集</h1>
+    <h1 class="header__title">📝 Todoを編集</h1>
   </header>
 
   <main class="container">
@@ -24,9 +24,19 @@
     {% endwith %}
 
     <section class="card">
+
+      <!-- 現在の完了ステータスを表示 -->
+      <div class="status-indicator">
+        {% if todo.status == 'completed' %}
+          <span class="status-badge status-badge--completed">✅ 完了済み</span>
+          <span class="status-note">完了/未完了の切り替えは一覧画面のチェックボックスからできます</span>
+        {% else %}
+          <span class="status-badge status-badge--incomplete">🔲 未完了</span>
+        {% endif %}
+      </div>
+
       <h2 class="card__title">情報を更新する</h2>
 
-      <!-- 編集フォーム（todo.id のURLにPOSTで送信） -->
       <form action="/edit/{{ todo.id }}" method="POST" class="form">
 
         <div class="form__group">
@@ -64,13 +74,13 @@
 
         <div class="form__actions">
           <button class="btn btn--primary" type="submit">更新する</button>
-          <!-- キャンセルで一覧に戻る -->
           <a href="/" class="btn btn--secondary">キャンセル</a>
         </div>
+
       </form>
     </section>
 
-    <p class="todo-item__created" style="text-align:center; margin-top: 1rem;">
+    <p class="todo-item__created" style="text-align:center; margin-top:1rem;">
       登録日時：{{ todo.created_at }}
     </p>
 
