@@ -1,4 +1,37 @@
-# 📝 Todo リスト Web アプリ
+# Todo管理 × Google Sheets × LINE通知
+
+タスクをWeb画面で管理し、Googleスプレッドシートへ保存して、期日が近い未完了タスクをLINEで通知するアプリです。
+
+[作品一覧](https://github.com/moedaichi0629-ai/landing-page) · [ポートフォリオ](https://moedaichi0629-ai.github.io/landing-page/)
+
+## 解決する課題
+
+**想定利用者：** スプレッドシートでタスクの記録も確認したい利用者
+
+タスク管理と期限確認が別々になり、確認の手間が増えること。
+
+## 主な機能
+
+- タスク登録・編集・削除・完了管理
+- キーワード・期限・完了状態による絞り込み
+- Google Sheets保存とLINE通知
+
+## デモ・利用方法
+
+[公開アプリ](https://todo-app-1p8e.onrender.com)
+
+## 使用技術
+
+Python / Flask / Google Sheets API / LINE Messaging API / Render
+
+## 工夫した点
+
+専用DBの代わりにGoogle Sheetsを保存先にし、Web画面とシートの両方から記録を確認できます。
+
+## セットアップ・技術詳細
+
+<details>
+<summary>操作方法・構成・設定手順などの詳細を開く</summary>
 
 ![Python](https://img.shields.io/badge/Python-3.12-blue?logo=python&logoColor=white)
 ![Flask](https://img.shields.io/badge/Flask-3.0-black?logo=flask&logoColor=white)
@@ -285,3 +318,6 @@ python app.py
 ## ライセンス
 
 MIT License
+
+</details>
+
