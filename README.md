@@ -2,7 +2,7 @@
 
 タスクをWeb画面で管理し、Googleスプレッドシートへ保存して、期日が近い未完了タスクをLINEで通知するアプリです。
 
-[作品一覧](https://github.com/moedaichi0629-ai/landing-page) · [ポートフォリオ](https://moedaichi0629-ai.github.io/landing-page/)
+[作品一覧](https://github.com/moedaichi0629-ai/landing-page) · [ポートフォリオ](https://moedaichi0629-ai.github.io/)
 
 ## 解決する課題
 
